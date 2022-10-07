@@ -1,4 +1,5 @@
 import java.sql.*;
+import java.util.HashSet;
 
 public class DBManagement{
     public static void main(String[] args) {
@@ -10,6 +11,10 @@ public class DBManagement{
             getUserById(connection, 7);
             updateProductName(connection, 3, "Macbook");
             updateAddress(connection,7, "France, Paris 102-90");
+//            updateAddress(connection,7, "USA, New York 101-23");
+
+            getRank(connection, 177);
+            getUsers(connection, false);
 
         } catch (Exception e){
             e.printStackTrace();
@@ -90,4 +95,29 @@ public class DBManagement{
             }
         }
     }
+
+    public static void getRank (Connection connection, double height) throws SQLException {
+        CallableStatement callableStatement = connection.prepareCall("{? = call test.getAllCustomerRankByHeight(?)}");
+        callableStatement.registerOutParameter(1, Types.VARCHAR);
+        callableStatement.setDouble(2, height);
+
+        ResultSet rs = callableStatement.executeQuery();
+        while (rs.next()){
+            System.out.println(rs.getString(1));
+        }
+        callableStatement.close();
+    }
+
+    public static void getUsers(Connection connection, boolean asc) throws SQLException{
+        PreparedStatement pStatement = connection.prepareStatement("{call test.getUsersOrder(?)}");
+        pStatement.setBoolean(1, asc);
+
+        ResultSet rs = pStatement.executeQuery();
+        while (rs.next()){
+            System.out.println(rs.getString(1));
+        }
+        pStatement.close();
+
+    }
+
 }
